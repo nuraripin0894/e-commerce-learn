@@ -7,14 +7,13 @@ import {
 
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import SimpleDashboardPage from "./pages/SimpleDashboardPage";
 import DashboardPage from "./pages/DashboardPage";
+import CounterPage from "./pages/CounterPage";
+import ProductsPage from "./pages/ProductsPage";
 
 const HomePage = () => <h1>Home Page</h1>;
 const UsersPage = () => <h1>Users Page</h1>;
-const ProductsPage = () => <h1>Products Page</h1>;
 const TransactionsPage = () => <h1>Transactions Page</h1>;
-const CounterPage = () => <h1>Counter Page</h1>;
 
 const router = createBrowserRouter([
   {

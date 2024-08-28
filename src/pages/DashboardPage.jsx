@@ -1,7 +1,7 @@
-import { Button } from "@nextui-org/react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks";
 import {
+  ArrowRightEndOnRectangleIcon,
   CalculatorIcon,
   CurrencyDollarIcon,
   HomeIcon,
@@ -9,10 +9,10 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 
-import enigmaGrowLogo from "../assets/enigma_grow.png";
+import { classNames } from "../utils/styles.util";
 
-const navigation = [
-  { name: "Home", href: "/dasboard", icon: HomeIcon },
+const navigationList = [
+  { name: "Home", href: "/dashboard", icon: HomeIcon },
   {
     name: "Users",
     href: "/dashboard/users",
@@ -38,6 +38,7 @@ const navigation = [
 function DashboardPage() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const logoutHandler = () => {
     logout();
     navigate("/login");
@@ -68,7 +69,61 @@ function DashboardPage() {
               </div>
             </div>
           </div>
+          <div>
+            <nav className="flex-1 flex flex-col overflow-y-auto">
+              <div className="flex-1 px-2 py-4 space-y-1">
+                {navigationList.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <NavLink
+                      key={item.name}
+                      to={item.href}
+                      end
+                      className={({ isActive }) => {
+                        const dynamicClassName = isActive
+                          ? "bg-primary-dark text-text-white"
+                          : "text-text-gray hover:bg-primary-light hover:text-text-white";
+
+                        return classNames(
+                          dynamicClassName,
+                          "group flex items-center  px-2 text-sm font-medium rounded-md"
+                        );
+                      }}
+                    >
+                      <IconComponent className="mr-3 flex-shrink-0 h-6 w-6" />
+                      <span className="hidden md:inline">{item.name}</span>
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </nav>
+          </div>
+          <div className="flex-shrink-0 flex flex-col border-t border-primary-light p-4">
+            <button
+              onClick={logoutHandler}
+              className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium  rounded-md text-text-white bg-primary-dark hover:bg-primary-darker focus:outline-none focus:ring-offset-2 focus:ring-primary"
+            >
+              <ArrowRightEndOnRectangleIcon className="mr-3 h-5 min-w-5" />
+              <span className="hidden md:inline ">Logout</span>
+            </button>
+          </div>
         </div>
+      </div>
+      <div className="flex-1 overflow-auto focus:outline-none">
+        <main className="flex-1 relative z-0 overflow-y-auto py-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <h1 className="text-2xl font-semibold text-gray-900">
+              {navigationList.find((item) => {
+                return item.href === location.pathname;
+              })?.name || "Not Found"}
+            </h1>
+          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div className="py-4">
+              <Outlet />
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
