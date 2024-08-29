@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export const productSlice = createSlice({
+export const productsSlice = createSlice({
   name: "products",
   initialState: {
     items: [],
@@ -10,8 +10,17 @@ export const productSlice = createSlice({
   },
   reducers: {
     setProducts: (state, action) => {
-      state.items = action.payload.items;
-      state.total = action.payload.total;
+      (state.items = action.payload.items),
+        (state.total = action.payload.total);
+    },
+    createProduct: (state, action) => {
+      (state.items = [...state.items, action.payload]), (state.total += 1);
+    },
+    updateProduct: (state, action) => {
+      const { id, item } = action.payload;
+      state.items = state.items.map((productItem) =>
+        productItem === id ? item : productItem
+      );
     },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
@@ -23,8 +32,14 @@ export const productSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setProducts, setLoading, setError } = productSlice.actions;
-const { reducer: productsReducer } = productSlice;
+export const {
+  setProducts,
+  createProduct,
+  updateProduct,
+  setLoading,
+  setError,
+} = productsSlice.actions;
+const { reducer: productsReducer } = productsSlice;
 
 // export default counterSlice.reducer
 export default productsReducer;

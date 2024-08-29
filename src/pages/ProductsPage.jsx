@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ProductsApi from "../apis/ProductsApi";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Pagination,
-} from "@nextui-org/react";
+import { Pagination } from "@nextui-org/react";
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { TrashIcon } from "@heroicons/react/24/solid";
+import { CloseFilledIcon, SearchIcon } from "../assets/icons";
+import { useDebounce } from "use-debounce";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
   { id: "no", label: "No.", className: "py-3.5 pl-4 pr-3 sm:pl-6" },
@@ -26,24 +23,36 @@ const columns = [
 
 function ProductsPage() {
   // const { product, setProduct } = useState(null);
-  const isLoading = useSelector((state) => state.products.isLoading);
+  // const isLoading = useSelector((state) => state.products.isLoading);
   const productList = useSelector((state) => state.products.items);
   const total = useSelector((state) => state.products.total);
   const error = useSelector((state) => state.products.error);
 
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debounceSearchQuery] = useDebounce(searchQuery, 700);
+
+  const createProductHandler = () => {
+    navigate("/dashboard/products/new");
+  };
+
+  const updateProductHandler = (product) => () => {
+    navigate(`/dashboard/products/${product.id}`, { state: { product } });
+  };
 
   useEffect(() => {
-    ProductsApi.getProducts(page, 10);
-  }, [page]);
+    ProductsApi.getProducts(page, limit, debounceSearchQuery);
+  }, [page, limit, debounceSearchQuery]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <div className="animate-spin rounded-full h-32 w-32 border border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-full">
+  //       <div className="animate-spin rounded-full h-32 w-32 border border-b-2 border-primary"></div>
+  //     </div>
+  //   );
+  // }
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
@@ -67,9 +76,36 @@ function ProductsPage() {
           </h1>
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-          <button className="flex items-center justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-light sm:ml-3 sm:w-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition duration-150 ease-in-out">
-            Add product
-          </button>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <input
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                }}
+                className="w-full pl-10 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary
+            focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setPage(1);
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                  {<CloseFilledIcon />}
+                </button>
+              )}
+            </div>
+            <button
+              onClick={createProductHandler}
+              className="flex items-center justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-light sm:ml-3 sm:w-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition duration-150 ease-in-out"
+            >
+              Create product
+            </button>
+          </div>
         </div>
       </div>
 
@@ -115,11 +151,7 @@ function ProductsPage() {
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-center">
                           <div className="flex justify-center items-center space-x-2">
-                            <button
-                              onClick={() => {
-                                alert("edit");
-                              }}
-                            >
+                            <button onClick={updateProductHandler(productItem)}>
                               <PencilIcon className="h-5 w-5 text-primary hover:text-primary-light transition duration-150 ease-in-out" />
                             </button>
                             <button

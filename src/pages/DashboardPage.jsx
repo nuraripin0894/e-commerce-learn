@@ -35,6 +35,8 @@ const navigationList = [
   },
 ];
 
+const reversedNavigationList = [...navigationList].reverse();
+
 function DashboardPage() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
@@ -113,9 +115,11 @@ function DashboardPage() {
         <main className="flex-1 relative z-0 overflow-y-auto py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <h1 className="text-2xl font-semibold text-gray-900">
-              {navigationList.find((item) => {
-                return item.href === location.pathname;
-              })?.name || "Not Found"}
+              {location.pathname === "/dashboard"
+                ? "Home"
+                : reversedNavigationList.find((item) => {
+                    return location.pathname.includes(item.href);
+                  })?.name || "Notfound"}
             </h1>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">

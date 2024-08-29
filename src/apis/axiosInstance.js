@@ -5,6 +5,26 @@ const axiosInstance = axios.create({
   timeout: 5000,
 });
 
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    if (config.url.includes("login") || config.url.includes("register")) {
+      return config; //langsung hit ke backend
+    }
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${accessToken}`,
+      };
+    }
+    return config;
+  },
+  (error) => {
+    console.log("axiosInstance.interceptors.request Error", error.message);
+    return Promise.reject(error);
+  }
+);
+
 // if backend not yet ready
 // const axiosInstance = {
 //   post: (url, body) => {

@@ -3,9 +3,9 @@ import { zodResolver } from "@hookform/resolvers/zod"; // npm i @hookform/resolv
 import * as z from "zod";
 
 import PageTitle from "../components/PageTitle";
-import enigmaGrowLogo from "../assets/enigma_grow.png";
 import { useAuth } from "../hooks";
 import { useNavigate } from "react-router-dom";
+import Images from "../assets/images";
 
 const schema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -37,7 +37,7 @@ function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <img
           className="mx-auto h-[120px] w-auto"
-          src={enigmaGrowLogo}
+          src={Images.enigma_grow}
           alt="Enigma Company Logo"
         />
         <h2 className="text-2xl mt-4 text-center font-bold leading-9 tracking-tight text-gray-900">
