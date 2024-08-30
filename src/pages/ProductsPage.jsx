@@ -89,7 +89,7 @@ function ProductsPage() {
   const totalPages = Math.ceil(total / 10);
 
   if (error) {
-    return <div className="text-red-600 text-center">{error}</div>;
+    throw new Error(error);
   }
 
   return (

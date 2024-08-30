@@ -12,6 +12,7 @@ import CounterPage from "./pages/CounterPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailsPage from "./pages/productDetailsPage/index";
 import FileUpload from "./learning/FileUpload";
+import ErrorFallbackPage from "./pages/ErrorFallbackPage";
 
 const HomePage = () => <h1>Home Page</h1>;
 const UsersPage = () => <h1>Users Page</h1>;
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
         <Outlet />
       </ProtectedRoute>
     ),
+    errorElement: <ErrorFallbackPage />,
     children: [
       {
         path: "",
