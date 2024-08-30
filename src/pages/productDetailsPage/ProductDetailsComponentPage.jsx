@@ -1,145 +1,19 @@
 import { Select, SelectItem } from "@nextui-org/react";
-import ProductFormLabel from "../components/ProductFormLabel";
-import {
-  Navigate,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import { useEffect, useState } from "react";
-import ProductsApi from "../apis/ProductsApi";
-import { useSelector } from "react-redux";
-import { IMAGE_PLACEHOLDER_URL } from "../constants/image.constant";
-import { setProducts } from "../redux/products/productsSlice";
+import ProductFormLabel from "../../components/ProductFormLabel";
+import PropTypes from "prop-types";
 
-function ProductDetailsPage() {
-  const params = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [product, setProduct] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    categoryIds: [],
-    image: null,
-    imageUrl: IMAGE_PLACEHOLDER_URL,
-  });
-
-  const categories = useSelector((state) => {
-    return state.productCategories.items;
-  });
-
-  const { id: productId } = params;
-
-  const customSetProduct = (product) => {
-    setProduct((previousProductState) => {
-      return {
-        ...previousProductState,
-        ...product,
-        categoryIds: product.categories.map((categoryItem) =>
-          categoryItem.id.toString()
-        ),
-        imageUrl:
-          product.imageUrls && product.imageUrls.length > 0
-            ? product.imageUrls[0]
-            : IMAGE_PLACEHOLDER_URL,
-      };
-    });
-  };
-
-  const getProductDetail = async (productId) => {
-    const productDetail = await ProductsApi.getProduct(productId);
-    customSetProduct(productDetail);
-  };
-
-  const inputHandler = (e) => {
-    const { name, value } = e.target;
-    setProduct((previousProduct) => {
-      return {
-        ...previousProduct,
-        [name]: value,
-      };
-    });
-  };
-
-  const categorieshandler = (select) => {
-    setProduct((previousProduct) => {
-      return {
-        ...previousProduct,
-        categoryIds: [...select],
-      };
-    });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProduct((prevProduct) => {
-          return {
-            ...prevProduct,
-            image: file,
-            imageUrl: reader.result,
-          };
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setProduct((prevProduct) => {
-      return {
-        ...prevProduct,
-        image: null,
-        imageUrl: IMAGE_PLACEHOLDER_URL,
-      };
-    });
-  };
-
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append("name", product.name);
-      formData.append("description", product.description);
-      formData.append("price", product.price);
-      formData.append("stock", product.stock);
-      formData.append("categoryIds", product.categoryIds.join(","));
-
-      if (product.image) {
-        formData.append("image", product.image);
-      }
-
-      if (productId) {
-        await ProductsApi.updateProduct(productId, formData);
-      } else {
-        await ProductsApi.createProduct(formData);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    ProductsApi.getCategories();
-
-    if (productId) {
-      const navigationState = location.state;
-      const { product } = navigationState;
-      customSetProduct(product);
-      getProductDetail(productId);
-    }
-  }, [productId]);
-
-  const isEditForm = !!productId;
-
-  const cancelhandler = () => {
-    navigate(-1);
-  };
-
+function ProductDetailsComponentPage(props) {
+  const {
+    isEditForm,
+    product,
+    categories,
+    inputHandler,
+    categoriesHandler,
+    handleImageChange,
+    handleRemoveImage,
+    submitHandler,
+    cancelHandler,
+  } = props;
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">
@@ -213,7 +87,7 @@ function ProductDetailsPage() {
                 placeholder="Select categories"
                 className="w-full"
                 selectedKeys={product.categoryIds}
-                onSelectionChange={categorieshandler}
+                onSelectionChange={categoriesHandler}
               >
                 {categories.map((categoryItem) => (
                   <SelectItem
@@ -275,7 +149,7 @@ function ProductDetailsPage() {
           </div>
           <div className="flex justify-end space-x-4">
             <button
-              onClick={cancelhandler}
+              onClick={cancelHandler}
               type="button"
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
@@ -293,4 +167,17 @@ function ProductDetailsPage() {
     </div>
   );
 }
-export default ProductDetailsPage;
+
+ProductDetailsComponentPage.propTypes = {
+  isEditForm: PropTypes.bool.isRequired,
+  product: PropTypes.object,
+  categories: PropTypes.arrayOf(PropTypes.object),
+  inputHandler: PropTypes.func.isRequired,
+  categoriesHandler: PropTypes.func.isRequired,
+  handleImageChange: PropTypes.func.isRequired,
+  handleRemoveImage: PropTypes.func.isRequired,
+  submitHandler: PropTypes.func.isRequired,
+  cancelHandler: PropTypes.func.isRequired,
+};
+
+export default ProductDetailsComponentPage;

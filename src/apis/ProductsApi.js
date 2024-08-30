@@ -87,7 +87,6 @@ class ProductsApi {
       store.dispatch(createProduct(response.data));
       toast.success("Product created successfully");
     } catch (error) {
-      console.log(`Error add product: ${error.message}`);
       store.dispatch(setError(error.message));
       toast.error("Failed to create product");
     } finally {
@@ -101,12 +100,27 @@ class ProductsApi {
       const response = await axiosInstance.put(`/products/${id}`, productData, {
         headers: { "Content-type": "multipart/form-data" },
       });
+      console.log(response.data);
       store.dispatch(updateProduct(response.data));
+
       toast.success("Product updated successfully");
     } catch (error) {
-      console.log(`Error update product: ${error.message}`);
       store.dispatch(setError(error.message));
       toast.error("Failed to update product");
+    } finally {
+      store.dispatch(setLoading(false));
+    }
+  }
+
+  static async deleteProduct(id, page, limit, query) {
+    store.dispatch(setLoading(true));
+    try {
+      await axiosInstance.delete(`/products/${id}`);
+      toast.success("Product deleted successfully");
+      await this.getProducts(page, limit, query);
+    } catch (error) {
+      store.dispatch(setError(error.message));
+      toast.error("Failed to delete product");
     } finally {
       store.dispatch(setLoading(false));
     }

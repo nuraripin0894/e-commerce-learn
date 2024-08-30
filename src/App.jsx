@@ -10,7 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import CounterPage from "./pages/CounterPage";
 import ProductsPage from "./pages/ProductsPage";
-import ProductDetailsPage from "./pages/ProductDetailsPage";
+import ProductDetailsPage from "./pages/productDetailsPage/index";
 import FileUpload from "./learning/FileUpload";
 
 const HomePage = () => <h1>Home Page</h1>;

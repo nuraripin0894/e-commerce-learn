@@ -17,7 +17,7 @@ export const productsSlice = createSlice({
       (state.items = [...state.items, action.payload]), (state.total += 1);
     },
     updateProduct: (state, action) => {
-      const { id, item } = action.payload;
+      const { id, item } = [...state.items, action.payload];
       state.items = state.items.map((productItem) =>
         productItem.id === id ? item : productItem
       );
