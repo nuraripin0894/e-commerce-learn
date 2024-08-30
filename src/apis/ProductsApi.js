@@ -9,6 +9,7 @@ import {
 } from "../redux/products/productsSlice";
 import store from "../redux/store";
 import axiosInstance from "./axiosInstance";
+import { toast } from "sonner";
 
 class ProductsApi {
   static async getProducts(page = 1, limit = 10, query) {
@@ -54,6 +55,12 @@ class ProductsApi {
       store.dispatch(setError(error.message));
       throw new Error(`ProductAPI ${error.message}`);
     } finally {
+      const currentDate = dayjs(new Date().toISOString());
+      const isLessThanOneHour = currentDate.diff(lastSet, "hour", true) < 1;
+      if (isLessThanOneHour) {
+        // eslint-disable-next-line no-unsafe-finally
+        return;
+      }
       store.dispatch(setLoading(false));
     }
   }
@@ -78,9 +85,11 @@ class ProductsApi {
         headers: { "Content-type": "multipart/form-data" },
       });
       store.dispatch(createProduct(response.data));
+      toast.success("Product created successfully");
     } catch (error) {
       console.log(`Error add product: ${error.message}`);
       store.dispatch(setError(error.message));
+      toast.error("Failed to create product");
     } finally {
       store.dispatch(setLoading(false));
     }
@@ -93,9 +102,11 @@ class ProductsApi {
         headers: { "Content-type": "multipart/form-data" },
       });
       store.dispatch(updateProduct(response.data));
+      toast.success("Product updated successfully");
     } catch (error) {
       console.log(`Error update product: ${error.message}`);
       store.dispatch(setError(error.message));
+      toast.error("Failed to update product");
     } finally {
       store.dispatch(setLoading(false));
     }

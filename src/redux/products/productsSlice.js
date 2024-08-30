@@ -19,7 +19,7 @@ export const productsSlice = createSlice({
     updateProduct: (state, action) => {
       const { id, item } = action.payload;
       state.items = state.items.map((productItem) =>
-        productItem === id ? item : productItem
+        productItem.id === id ? item : productItem
       );
     },
     setLoading: (state, action) => {
